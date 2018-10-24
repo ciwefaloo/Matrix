@@ -10,5 +10,8 @@ private:
 public:
 	Matrix(int p_n, int p_m,int p_mas[max][max]);
 	void c_out();
+
+	Matrix operator= (Matrix &temp);
+	bool operator== (Matrix &temp);
 };
 

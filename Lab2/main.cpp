@@ -19,6 +19,20 @@ int main() {
 	}
 
 	Matrix matrix = Matrix(n, m, mas);
+
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < m; j++) {
+			cin >> mas[i][j];
+		}
+	}
+	Matrix matrix2 = Matrix(n, m, mas);
+	//matrix = matrix2;
+	if (matrix == matrix2) {
+		cout << "true" << endl;
+	}
+	else {
+		cout << "false" << endl;
+	}
 	matrix.c_out();
 	system("pause");
 	return 0;
