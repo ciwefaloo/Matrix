@@ -6,12 +6,18 @@ class Matrix
 {
 private:
 	int n, m;
-	int a[max][max];
+	double a[max][max];
 public:
-	Matrix(int p_n, int p_m,int p_mas[max][max]);
+	Matrix(int p_n, int p_m);
 	void c_out();
-
 	Matrix operator= (Matrix &temp);
 	bool operator== (Matrix &temp);
+	Matrix operator+ (Matrix &temp);
+	Matrix operator- (Matrix &temp);
+	Matrix operator* (Matrix &temp);
+	Matrix operator* (double  &temp);
+	void operator >>(Matrix &temp);
+	void operator <<(Matrix &temp);
+	void operator ~();
 };
 
