@@ -112,3 +112,30 @@ void Matrix::operator ~() {
 		}
 	}
 }
+
+void Matrix::gauss_method() {
+	for (int i = 0; i < m-2; i++) {
+		for (int j = i+1; j < n; j++) {
+			double koef = -a[j][i] / a[i][i];
+			for (int k = i; k < m; k++) {
+				a[j][k] = a[i][k] * koef + a[j][k];
+			}
+		}
+	}
+	if (a[n - 1][n - 1] == 0) {
+		cout << "no solutions" << endl;
+	}
+	else {
+		for (int i = m - 2; i >= 1; i--) {
+			for (int j = i - 1; j >= 0; j--) {
+				double koef = -a[j][i] / a[i][i];
+				for (int k = m - 1; k >= i; k--) {
+					a[j][k] = a[i][k] * koef + a[j][k];
+				}
+			}
+		}
+		for (int i = 0; i < n; i++) {
+			cout << "x" << i + 1 << " = " << a[i][m - 1] / a[i][i] << ";" << endl;
+		}
+	}
+}

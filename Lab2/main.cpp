@@ -10,11 +10,10 @@ int main() {
 	int n,m;
 	cin >> n >> m;
 	Matrix matrix = Matrix(n, m);
-	//Matrix matrix2 = Matrix(n, m);
 	matrix >> matrix;
-	//matrix2 >> matrix2;
-	~matrix;
-	matrix.c_out();
+	matrix.gauss_method();
+	//matrix.c_out();
 	system("pause");
 	return 0;
+
 }

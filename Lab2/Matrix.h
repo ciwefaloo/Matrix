@@ -19,5 +19,6 @@ public:
 	void operator >>(Matrix &temp);
 	void operator <<(Matrix &temp);
 	void operator ~();
+	void gauss_method();
 };
 
