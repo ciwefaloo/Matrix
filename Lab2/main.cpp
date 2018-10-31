@@ -6,6 +6,7 @@ class Matrix {
 private:
 	int n, m;
 	double **arr = new double*[n];
+	double esp = 0.00001;
 public:
 	Matrix(int p_n, int p_m) {
 		n = p_n;
@@ -101,7 +102,6 @@ public:
 				stream >> temp.arr[i][j];
 			}
 		}
-
 		return stream;
 	}
 	friend ostream& operator <<(ostream& stream, Matrix &temp) {
@@ -120,7 +120,7 @@ public:
 			}
 		}
 	}
-	void gauss_method() {
+	void gauss_method(double *ans) {
 		if (m - n != 1) {
 			cout << "invalid matrix for Gauss method" << endl;
 		}
@@ -146,9 +146,96 @@ public:
 					}
 				}
 				for (int i = 0; i < n; i++) {
-					cout << "x" << i + 1 << " = " << arr[i][m - 1] / arr[i][i] << ";" << endl;
+					ans[i] = arr[i][m - 1] / arr[i][i];
 				}
 			}
+		}
+	}
+
+	bool symmetry() {
+		for (int i = 0; i < n; i++) {
+			for (int j = i + 1; j < n; j++) {
+				if (arr[i][j] != arr[j][i]) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	void jacobi(double *ans) {
+		double** turning = new double*[n];
+		double** temp = new double*[n];
+		for (int i = 0; i < n; i++) {
+			turning[i] = new double[n];
+			temp[i] = new double[n];
+			for (int j = i + 1; j < n; j++) {
+				turning[i][j] = temp[i][j] = 0;
+			}
+		}
+		double precision = 1;
+		int x, y;
+		double max;
+		while (precision > esp) {
+			x = 0;
+			y = 0;
+			max = 0.0;
+			precision = 0.0;
+			for (int i = 0; i < n; i++) {
+				for (int j = i + 1; j < n; j++) {
+					precision = precision + arr[i][j] * arr[i][j];
+				}
+			}
+			precision = sqrt(2 * precision);
+			for (int i = 0; i < n; i++) {
+				for (int j = i + 1; j < n; j++) {
+					if (fabs(arr[i][j]) > max) {
+						max = fabs(arr[i][j]);
+						x = i;
+						y = j;
+					}
+				}
+			}
+			for (int i = 0; i < n; i++) {
+				for (int j = 0; j < n; j++) {
+					turning[i][j] = 0;
+					temp[i][j] = 0;
+				}
+				turning[i][i] = 1;
+			}
+			if (arr[x][x] == arr[y][y]) {
+				turning[x][x] = turning[y][y] = turning[y][x] = sqrt(2.0) / 2.0;
+				turning[x][y] = -sqrt(2.0) / 2.0;
+			}
+			else {
+				double koef = 0.5 * atan((2.0 * arr[x][y]) / (arr[x][x] - arr[y][y]));
+				turning[x][x] = turning[y][y] = cos(koef);
+				turning[x][y] = -sin(koef);
+				turning[y][x] = sin(koef);
+			}
+			
+			for (int i = 0; i < n; i++) {
+				for (int j = 0; j < n; j++) {
+					for (int k = 0; k < n; k++) {
+						temp[i][j] = temp[i][j] + turning[k][i] * arr[k][j];
+					}
+				}
+			}
+			for (int i = 0; i < n; i++) {
+				for (int j = 0; j < n; j++) {
+					arr[i][j] = 0.0;
+				}
+			}
+			for (int i = 0; i < n; i++) {
+				for (int j = 0; j < n; j++) {
+					for (int k = 0; k < n; k++) {
+						arr[i][j] = arr[i][j] + temp[i][k] * turning[k][j];
+					}
+				}
+			}
+		}
+		for (int i = 0; i < n; i++) {
+			ans[i] = arr[i][i];
 		}
 	}
 };
@@ -160,14 +247,34 @@ int main() {
 	Matrix matrix = Matrix(n, m);
 	cin >> matrix;
 
-	Matrix matrix2 = Matrix(n, m);
-	cin >> matrix2;
+	/*
+	double *ans =new  double[n];
+	for (int i = 0; i < n; i++) {
+		ans[i] = 0;
+	}
 
-	Matrix x = matrix + matrix2 + matrix - matrix2 * 4.0;
-	cout << endl;
-	cout << x;
-	cout << matrix;
-	cout << matrix2;
+	matrix.gauss_method(ans);
+	for (int i = 0; i < n; i++) {
+		cout << "x" << i + 1 << " = " << ans[i] << ";" << endl;
+	}
+	*/
+
+	double * ans = new double[n];
+	for (int i = 0; i < n; i++) {
+		ans[i] = 0;
+
+	}
+
+	if (!matrix.symmetry()) {
+		cout << "matrix dont symmetry" << endl;
+	}
+	else {
+		matrix.jacobi(ans);
+		for (int i = 0; i < n; i++) {
+			cout << ans[i] << endl;
+		}
+
+	}
 	system("pause");
 	return 0;
 
