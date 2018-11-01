@@ -20,7 +20,7 @@ public:
 	}
 	Matrix() = default;
 	Matrix operator= (const Matrix &temp) {
-		Matrix obj = *this;
+		Matrix obj = copy();
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < m; j++) {
 				obj.arr[i][j] = temp.arr[i][j];
@@ -28,6 +28,7 @@ public:
 		}
 		return obj;
 	}
+
 	bool operator== (Matrix &temp) {
 		if (n == temp.n && m == temp.m) {
 			for (int i = 0; i < n; i++) {
@@ -44,12 +45,7 @@ public:
 		}
 	}
 	Matrix operator+ (const Matrix &temp) {
-		Matrix obj = Matrix(n, m);
-		for (int i = 0; i < obj.n; i++) {
-			for (int j = 0; j < obj.m; j++) {
-				obj.arr[i][j] = arr[i][j];
-			}
-		}
+		Matrix obj = copy();
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < m; j++) {
 				obj.arr[i][j] += temp.arr[i][j];
@@ -58,12 +54,7 @@ public:
 		return obj;
 	}
 	Matrix operator- (const Matrix &temp) {
-		Matrix obj = Matrix(n, m);
-		for (int i = 0; i < obj.n; i++) {
-			for (int j = 0; j < obj.m; j++) {
-				obj.arr[i][j] = arr[i][j];
-			}
-		}
+		Matrix obj = copy();
 		for (int i = 0; i < obj.n; i++) {
 			for (int j = 0; j < obj.m; j++) {
 				obj.arr[i][j] -= temp.arr[i][j];
@@ -82,13 +73,18 @@ public:
 		}
 		return ans;
 	}
-	Matrix operator* (const double &temp) {
+
+	Matrix copy() {
 		Matrix obj = Matrix(n, m);
 		for (int i = 0; i < obj.n; i++) {
 			for (int j = 0; j < obj.m; j++) {
 				obj.arr[i][j] = arr[i][j];
 			}
 		}
+		return obj;
+	}
+	Matrix operator* (const double &temp) {
+		Matrix obj = copy();
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < m; j++) {
 				obj.arr[i][j] *= temp;
@@ -96,6 +92,11 @@ public:
 		}
 		return obj;
 	}
+
+	double* operator[](int x) { 
+		return arr[x];
+	}
+
 	friend istream& operator >>(istream& stream, Matrix &temp) {
 		for (int i = 0; i < temp.n; i++) {
 			for (int j = 0; j < temp.m; j++) {
@@ -238,42 +239,114 @@ public:
 			ans[i] = arr[i][i];
 		}
 	}
+
+	double scalar(Matrix &obj,int row, double* u) {
+		double res = 0;
+		for (int i = 0; i < n; i++) {
+			res = res + obj.arr[row][i] * u[i];
+		}
+		return res;
+	}
+
+	double norma(Matrix obj, int row) {
+		double res = 0;
+		for (int i = 0; i < n; i++) {
+			res = res + obj.arr[row][i] * obj.arr[row][i];
+		}
+		res = sqrt(res);
+		return res;
+	}
+
+	double len(double* u) {
+		double res = 0;
+		for (int i = 0; i < n; i++) {
+			res = res + u[i] * u[i];
+		}
+		res = sqrt(res);
+		return res;
+	}
+
+	double* kachmazh() {
+		Matrix obj = Matrix(n, m);
+		for (int i = 0; i < obj.n; i++) {
+			for (int j = 0; j < obj.m; j++) {
+				obj.arr[i][j] = arr[i][j];
+			}
+		}
+		int j = 0;
+		double precision = 1;
+		double* u = new double[n];
+		for (int i = 0; i < n; i++) {
+			u[i] = 1;
+		}
+		
+		while (precision > esp) {
+			j++;
+			j %= n;
+			double koef = (obj.arr[j][m - 1] - scalar(obj,j, u)) / (norma(obj,j)*norma(obj,j));
+			double len1 = len(u);
+			for (int i = 0; i < n; i++) {
+				u[i] = u[i]+obj.arr[j][i]*koef;
+			}
+			double len2 = len(u);
+			precision = fabs(len1 - len2);
+		}
+		return u;
+	}
 };
 
 int main() {
 
 	int n, m;
+	cout << "size matrix: ";
 	cin >> n >> m;
 	Matrix matrix = Matrix(n, m);
 	cin >> matrix;
-
-	/*
-	double *ans =new  double[n];
-	for (int i = 0; i < n; i++) {
-		ans[i] = 0;
-	}
-
-	matrix.gauss_method(ans);
-	for (int i = 0; i < n; i++) {
-		cout << "x" << i + 1 << " = " << ans[i] << ";" << endl;
-	}
-	*/
-
-	double * ans = new double[n];
-	for (int i = 0; i < n; i++) {
-		ans[i] = 0;
-
-	}
-
-	if (!matrix.symmetry()) {
-		cout << "matrix dont symmetry" << endl;
-	}
-	else {
-		matrix.jacobi(ans);
+	int type;
+	cout << "select method:\n 1-gauss \n 2-kachmazh\n 3-jacobi\n";
+	cin >> type;
+	if (type == 1) {
+		double *ans = new  double[n];
 		for (int i = 0; i < n; i++) {
-			cout << ans[i] << endl;
+			ans[i] = 0;
 		}
 
+		matrix.gauss_method(ans);
+		for (int i = 0; i < n; i++) {
+			cout << "x" << i + 1 << " = " << ans[i] << ";" << endl;
+		}
+	}
+	else if (type == 2) {
+
+		double * ans = new double[n];
+		for (int i = 0; i < n; i++) {
+			ans[i] = 0;
+
+		}
+
+		if (!matrix.symmetry()) {
+			cout << "matrix dont symmetry" << endl;
+		}
+		else {
+			matrix.jacobi(ans);
+			for (int i = 0; i < n; i++) {
+				cout << ans[i] << endl;
+			}
+
+		}
+	}
+	else if(type == 3){
+		double* ans = new double[n];
+		for (int i = 0; i < n; i++) {
+			ans[i] = 0;
+		}
+		ans = matrix.kachmazh();
+		for (int i = 0; i < n; i++) {
+			cout << "x" << i + 1 << " = " << ans[i] << ";" << endl;
+		}
+	}
+	else {
+		cout << "invalid type" << endl;
 	}
 	system("pause");
 	return 0;
