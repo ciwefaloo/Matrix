@@ -24,19 +24,18 @@ Matrix Matrix::operator= (const Matrix &temp) {
 }
 
 bool Matrix::operator== (Matrix &temp) {
-	if (n == temp.n && m == temp.m) {
-		for (int i = 0; i < n; i++) {
-			for (int j = 0; j < m; j++) {
-				if (arr[i][j] != temp.arr[i][j]) {
-					return false;
-				}
-			}
-		}
-		return true;
-	}
-	else {
+	if (n != temp.n || m != temp.m) {
 		return false;
 	}
+
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < m; j++) {
+			if (arr[i][j] != temp.arr[i][j]) {
+				return false;
+			}
+		}
+	}
+	return true;
 }
 Matrix Matrix::operator+ (const Matrix &temp) {
 	Matrix obj = copy();
@@ -99,6 +98,7 @@ istream& operator >>(istream& stream, Matrix &temp) {
 	}
 	return stream;
 }
+
 ostream& operator <<(ostream& stream, Matrix &temp) {
 	for (int i = 0; i < temp.n; i++) {
 		for (int j = 0; j < temp.m; j++) {
